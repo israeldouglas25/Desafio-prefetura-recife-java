@@ -37,7 +37,10 @@ public class PessoaService {
 
 	@Transactional
 	public Pessoa save(Pessoa pessoa) {
-		return pessoaRepository.save(pessoa);
+		Pessoa saved = pessoaRepository.save(pessoa);
+		pessoa.compareTo(saved);
+		pessoa.setPosicao(saved.getId());
+		return saved;
 	}
 
 	@Transactional
