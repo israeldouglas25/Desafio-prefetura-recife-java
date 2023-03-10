@@ -3,28 +3,27 @@ package br.com.recifepe.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
-public class Pessoa implements Comparable<Pessoa>{
-	
-	@EqualsAndHashCode.Include
-	@jakarta.persistence.Id
+public class Pessoa {
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nome;
-	private int idade;
-	private Long posicao;
-	
-	@Override
-	public int compareTo(Pessoa p) {
-		return p.getId() < this.id ? 1 : -1;
-	}
-	
+	private Integer idade;
+	private String telefone;
+	private Integer posicao;
+	private Integer numClienteFila;
+	private Boolean atendida;
 
 }

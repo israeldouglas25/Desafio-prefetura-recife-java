@@ -1,7 +1,8 @@
-package br.com.recifepe.contraller;
+package br.com.recifepe.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class PessoaController {
 	
 	@PostMapping
 	public ResponseEntity<Pessoa> insert(@RequestBody Pessoa pessoa){
-		return ResponseEntity.ok(pessoaService.save(pessoa));
+		return new ResponseEntity<>(pessoaService.save(pessoa), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")

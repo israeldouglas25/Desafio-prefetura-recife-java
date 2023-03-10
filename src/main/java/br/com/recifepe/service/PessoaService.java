@@ -1,5 +1,6 @@
 package br.com.recifepe.service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,11 +17,13 @@ public class PessoaService {
 	private PessoaRepository pessoaRepository;
 
 	public List<Pessoa> findAll() {
-		return pessoaRepository.findAll();
+		List<Pessoa> pessoas = pessoaRepository.findAll();
+		pessoas.sort(Comparator.comparing(Pessoa::getPosicao));
+		return pessoas;
 	}
 
 	public Pessoa findById(Long id) {
-		return pessoaRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found!"));
+		return pessoaRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 	}
 
 	@Transactional
@@ -30,6 +33,11 @@ public class PessoaService {
 		pessoaDb.setId(id);
 		pessoaDb.setNome(pessoa.getNome());
 		pessoaDb.setIdade(pessoa.getIdade());
+		pessoaDb.setTelefone(pessoa.getTelefone());
+		pessoaDb.setPosicao(pessoa.getPosicao());
+		pessoaDb.setAtendida(pessoa.getAtendida());
+		
+		atendida(pessoaDb);
 
 		return pessoaRepository.save(pessoaDb);
 
@@ -37,9 +45,19 @@ public class PessoaService {
 
 	@Transactional
 	public Pessoa save(Pessoa pessoa) {
-		Pessoa saved = pessoaRepository.save(pessoa);
-		pessoa.compareTo(saved);
-		pessoa.setPosicao(saved.getId());
+		var posicoes = pessoaRepository.getPosicao();
+		
+		if(posicoes.size() > 1000) {
+			throw new RuntimeException("Limite excedido!");
+		}
+		
+		int proxPosicao = posicoes.isEmpty() ? 1 : posicoes.get(0) + 1;
+		pessoa.setPosicao(proxPosicao);
+		
+		atendida(pessoa);
+		
+		var saved = pessoaRepository.save(pessoa);
+		
 		return saved;
 	}
 
@@ -49,6 +67,17 @@ public class PessoaService {
 			throw new RuntimeException("User not found!");
 		}
 		pessoaRepository.deleteById(id);
+	}
+	
+	public void atendida(Pessoa pessoa) {
+		List<Pessoa> pessoas = pessoaRepository.findAll();
+		int numFila = pessoas.size();
+		
+		if(pessoa.getAtendida() == true) {
+			pessoa.setNumClienteFila(numFila - 1);
+		}else {
+			pessoa.setNumClienteFila(numFila);
+		}
 	}
 
 }
